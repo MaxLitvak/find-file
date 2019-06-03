@@ -60,28 +60,39 @@ function getDirs() {
             {
                 allDirs=($(ls -a -d */))
             } &> /dev/null
-            for ((x=1; x<${#allDirs[@]}+1; x++))
- 	    do
-                if [[ ${allDirs[$x]} != *"/"*  ]] && [[ "${allDirs[$x]}" != "!%%%%!" ]]; then	
-                    place=0
-                    while [ true  ]
-                    do
-                        if [[ ${allDirs[$(($x + $place))]} == *"/"* ]]; then
-                            break
-                        else	
-                            place=$(($place + 1))
-                        fi
-                    done
-                    for ((a=1; a<$place+1; a++))
-                    do
-                        allDirs[$x]=${allDirs[$x]}^${allDirs[$(($x+$a))]}
-                    done
-                    for ((a=1; a<$place+1; a++))
-                    do
-                        allDirs[$(($x+$a))]="!%%%%!"
-                    done
+            if [[ ${#allDirs} -gt 40 ]]; then
+                echo Do you want to search $(pwd). "It might take a while (Y/n)"
+                read response
+                if [[ $response == *"y"* ]] || [[ $response == *"Y"* ]]; then
+                    response='yes'
+                else
+                    response='no'
                 fi
-            done
+            fi
+            if [ "$response" = "yes" ]; then
+                for ((x=1; x<${#allDirs[@]}+1; x++))
+                do
+                    if [[ ${allDirs[$x]} != *"/"*  ]] && [[ "${allDirs[$x]}" != "!%%%%!" ]]; then	
+                        place=0
+                        while [ true  ]
+                        do
+                            if [[ ${allDirs[$(($x + $place))]} == *"/"* ]]; then
+                                break
+                            else	
+                                place=$(($place + 1))
+                            fi
+                        done
+                        for ((a=1; a<$place+1; a++))
+                        do
+                            allDirs[$x]=${allDirs[$x]}^${allDirs[$(($x+$a))]}
+                        done
+                        for ((a=1; a<$place+1; a++))
+                        do
+                            allDirs[$(($x+$a))]="!%%%%!"
+                        done
+                    fi
+                done
+            fi
 
             for i in ${allDirs[@]}
             do
